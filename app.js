@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 const hbs = require('hbs');
 
 const index = require('./routes/index');
-const users = require('./routes/users');
 const weight_data = require('./routes/weight_data');
 
 const helper = require('./helper');
