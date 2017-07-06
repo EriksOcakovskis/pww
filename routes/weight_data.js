@@ -4,27 +4,28 @@ var express = require('express');
 var router = express.Router();
 
 /* GET weight data. */
-router.get('/', function(req, res) {
-  var user_id = 3;
-  var time_list = [];
-  var weight_list = [];
-  models.getUserWeights(user_id).then((userWeightsData) => {
-
+router.post('/', function(req, res) {
+  var userTimeOffset = req.body.timezoneOffset*60*60000;
+  var userID = 3;
+  var timeList = [];
+  var weightList = [];
+  models.getUserWeights(userID).then((userWeightsData) => {
     userWeightsData.forEach((value) => {
       d = new Date(value.timestamp.toString());
-      newDate =
-        `${('0' + d.getDate()).slice(-2)}/${('0' + (d.getMonth()+1)).slice(-2)}/${d.getFullYear()} ${('0' + d.getHours()).slice(-2)}:${('0' + d.getMinutes()).slice(-2)}`;
-      time_list.unshift(newDate);
-      weight_list.unshift(value.weight);
+      userDate = new Date(d.getTime() - userTimeOffset);
+      fromattedUserDate =
+        `${('0' + userDate.getUTCDate()).slice(-2)}/${('0' + (userDate.getUTCMonth()+1)).slice(-2)}/${userDate.getUTCFullYear()} ${('0' + userDate.getUTCHours()).slice(-2)}:${('0' + userDate.getUTCMinutes()).slice(-2)}`;
+      timeList.unshift(fromattedUserDate);
+      weightList.unshift(value.weight);
     });
 
     res.send({
       type: 'line',
         data: {
-          labels: time_list,
+          labels: timeList,
           datasets: [{
             label: 'Weight',
-            data: weight_list
+            data: weightList
           }]
         },
         options: {

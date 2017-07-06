@@ -4,23 +4,26 @@
 
   function makeRequest() {
     httpRequest = new XMLHttpRequest();
+    timezoneOffset = new Date().getTimezoneOffset()/60;
+    postData = JSON.stringify({'timezoneOffset':timezoneOffset});
 
     if (!httpRequest) {
       console.log('Giving up :( Cannot create an XMLHTTP instance');
       return false;
     }
-    httpRequest.onreadystatechange = alertContents;
-    httpRequest.open('GET', '/weight_data');
-    httpRequest.send();
+    httpRequest.onreadystatechange = processResponse;
+    httpRequest.open('POST', '/weight_data');
+    httpRequest.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    httpRequest.send(postData);
   }
 
-  function alertContents() {
+  function processResponse() {
     if (httpRequest.readyState === XMLHttpRequest.DONE) {
       if (httpRequest.status === 200) {
         chartData = JSON.parse(httpRequest.responseText);
         createChart(chartData);
       } else {
-        console.log(`REsponse failed with error code: ${httpRequest.status}`);
+        console.log(`Response failed with error code: ${httpRequest.status}`);
       }
     }
   }
